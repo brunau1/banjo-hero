@@ -19,13 +19,16 @@ class Game {
         this.noteInterval = 400; // time between notes
         this.nextLaneIndex = 0; // For sequential lane generation
 
+        // Track last note for each lane
+        this.laneNotes = Array(this.lanes).fill(null);
+
         // Increased speed variations
         this.speedLevels = [
-            300,  // Slow
-            400,  // Normal
+            400,  // Slow
+            450,  // Normal
             500,  // Fast
-            600,  // Very Fast
-            700   // Expert
+            550,  // Very Fast
+            600   // Expert
         ];
 
         // Combo system
@@ -76,11 +79,13 @@ class Game {
             hitNote.active = false;
             hitNote.createHitEffect();
 
+            // Clear lane reference when note is hit
+            this.laneNotes[lane] = null;
+
             // Update combo and score
             this.currentCombo++;
             this.maxCombo = Math.max(this.maxCombo, this.currentCombo);
 
-            // Score calculation with combo multiplier
             const comboMultiplier = Math.min(4, 1 + Math.floor(this.currentCombo / 10));
             this.score.value += 100 * comboMultiplier;
             this.score.display.textContent = this.score.value;
@@ -99,37 +104,58 @@ class Game {
     }
 
     generateNote() {
-        // Generate notes in a more structured pattern
-        const lane = this.nextLaneIndex;
-        this.nextLaneIndex = (this.nextLaneIndex + 2) % this.lanes; // Skip one lane for better pattern
+        // Find available lanes (where previous note was hit/missed or no note exists)
+        const availableLanes = [];
+        for (let i = 0; i < this.lanes; i++) {
+            const lastNote = this.laneNotes[i];
+            if (!lastNote || !lastNote.active || lastNote.y > 570) { // Past hit zone
+                availableLanes.push(i);
+            }
+        }
 
+        if (availableLanes.length === 0) return; // No available lanes
+
+        // Select random available lane
+        const laneIndex = availableLanes[Math.floor(Math.random() * availableLanes.length)];
         const speed = this.speedLevels[Math.floor(Math.random() * this.speedLevels.length)];
-        const note = new Note(lane, speed);
-        this.notes.push(note);
 
-        // Occasionally generate additional notes for chords
-        if (Math.random() < 0.3) { // 30% chance for additional note
-            const additionalLane = (lane + 2) % this.lanes;
-            const additionalNote = new Note(additionalLane, speed);
+        const note = new Note(laneIndex, speed);
+        this.notes.push(note);
+        this.laneNotes[laneIndex] = note;
+
+        // Occasionally generate additional note in another available lane
+        availableLanes.splice(availableLanes.indexOf(laneIndex), 1); // Remove used lane
+        if (availableLanes.length > 0 && Math.random() < 0.2) {
+            const additionalLaneIndex = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+            const additionalNote = new Note(additionalLaneIndex, speed);
             this.notes.push(additionalNote);
+            this.laneNotes[additionalLaneIndex] = additionalNote;
         }
     }
 
     update(deltaTime) {
+        // Update notes
+        this.notes.forEach(note => {
+            note.update(deltaTime);
+
+            // Clear lane reference if note is past hit zone
+            if (note.y > 570) {
+                const laneIndex = note.lane;
+                if (this.laneNotes[laneIndex] === note) {
+                    this.laneNotes[laneIndex] = null;
+                }
+            }
+        });
+
+        // Remove inactive notes
+        this.notes = this.notes.filter(note => note.y < this.canvas.height);
+
         // Generate new notes
         const currentTime = performance.now();
         if (currentTime - this.lastNoteTime > this.noteInterval) {
             this.generateNote();
             this.lastNoteTime = currentTime;
         }
-
-        // Update existing notes
-        this.notes.forEach(note => {
-            note.update(deltaTime);
-        });
-
-        // Remove notes that have gone off screen
-        this.notes = this.notes.filter(note => note.y < this.canvas.height);
     }
 
     draw() {
