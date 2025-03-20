@@ -15,17 +15,16 @@ class Game {
 
         // Note management
         this.notes = [];
-        this.noteSpeed = 200; // pixels per second
         this.lastNoteTime = 0;
-        this.noteInterval = 2000; // Time between notes in milliseconds
+        this.noteInterval = 1000; // Time between notes in milliseconds
 
         // Speed variations
         this.speedLevels = [
-            150,  // Slow
-            200,  // Normal
-            250,  // Fast
-            300,  // Very Fast
-            350   // Expert
+            300,  // Slow
+            400,  // Normal
+            500,  // Fast
+            600,  // Very Fast
+            700   // Expert
         ];
 
         // Combo system
@@ -154,23 +153,13 @@ class Game {
     }
 
     drawHitZone() {
-        // Draw hit zone background
-        const hitZoneY = 550;
-        const hitZoneHeight = 20;
+        // Draw hit zone background only (no borders)
+        const hitZoneY = 545;  // Adjusted for 10px height
+        const hitZoneHeight = 10;
 
         // Draw semi-transparent background
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         this.ctx.fillRect(0, hitZoneY, this.canvas.width, hitZoneHeight);
-
-        // Draw hit zone borders
-        this.ctx.strokeStyle = '#FFF';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, hitZoneY);
-        this.ctx.lineTo(this.canvas.width, hitZoneY);
-        this.ctx.moveTo(0, hitZoneY + hitZoneHeight);
-        this.ctx.lineTo(this.canvas.width, hitZoneY + hitZoneHeight);
-        this.ctx.stroke();
 
         // Draw key labels
         this.ctx.fillStyle = '#FFF';
@@ -179,7 +168,7 @@ class Game {
 
         for (let i = 0; i < this.lanes; i++) {
             const x = i * this.laneWidth + this.laneWidth / 2;
-            this.ctx.fillText(this.keyLabels[i], x, hitZoneY + 15);
+            this.ctx.fillText(this.keyLabels[i], x, hitZoneY + 8); // Adjusted y position for centered text
         }
     }
 

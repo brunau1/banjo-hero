@@ -5,21 +5,16 @@ class Note {
         this.y = 0;
         this.speed = speed;
         this.width = 50;
-        this.height = this.generateHeight();
+        this.height = 15;
         this.active = true;
         this.hit = false;
         this.hitEffect = null;
         this.missEffect = null;
     }
 
-    generateHeight() {
-        // Generate heights between 20 and 40 pixels
-        return Math.floor(Math.random() * 21) + 20;
-    }
-
     update(deltaTime) {
         this.y += this.speed * (deltaTime / 1000);
-        
+
         // Update hit effect
         if (this.hitEffect) {
             this.hitEffect.lifetime -= deltaTime;
@@ -41,9 +36,9 @@ class Note {
         if (!this.active) return;
 
         const x = this.lane * laneWidth + (laneWidth - this.width) / 2;
-        
+
         ctx.save();
-        
+
         // Draw the note rectangle
         ctx.fillStyle = this.hit ? '#4CAF50' : '#FFF';
         ctx.fillRect(x, this.y, this.width, this.height);
@@ -67,9 +62,9 @@ class Note {
 
     isInHitZone() {
         // The hit zone is between 530 and 570 pixels from the top
-        const hitZoneTop = 530;
-        const hitZoneBottom = 570;
-        
+        const hitZoneTop = 545;
+        const hitZoneBottom = 555;
+
         // Check if any part of the note overlaps with the hit zone
         const noteTop = this.y;
         const noteBottom = this.y + this.height;
@@ -79,8 +74,8 @@ class Note {
         // 2. Note bottom is within hit zone, OR
         // 3. Note completely encompasses hit zone
         return (noteTop >= hitZoneTop && noteTop <= hitZoneBottom) ||
-               (noteBottom >= hitZoneTop && noteBottom <= hitZoneBottom) ||
-               (noteTop <= hitZoneTop && noteBottom >= hitZoneBottom);
+            (noteBottom >= hitZoneTop && noteBottom <= hitZoneBottom) ||
+            (noteTop <= hitZoneTop && noteBottom >= hitZoneBottom);
     }
 
     createHitEffect() {
