@@ -35,26 +35,33 @@ class Note {
     draw(ctx, laneWidth) {
         if (!this.active) return;
 
-        const x = this.lane * laneWidth + (laneWidth - this.width) / 2;
-
+        this.width = laneWidth - 2; // -2 for small gap between lanes
+        const x = this.lane * laneWidth + 1; // +1 for centering
+        
         ctx.save();
-
+        
         // Draw the note rectangle
-        ctx.fillStyle = this.hit ? '#4CAF50' : '#FFF';
+        ctx.fillStyle = this.hit ? '#4CAF50' : 'rgba(255, 255, 255, 0.9)';
         ctx.fillRect(x, this.y, this.width, this.height);
 
-        // Draw hit effect
+        // Add a subtle gradient effect
+        const gradient = ctx.createLinearGradient(x, this.y, x, this.y + this.height);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, this.y, this.width, this.height);
+
+        // Draw hit/miss effects
         if (this.hitEffect) {
             ctx.globalAlpha = this.hitEffect.lifetime / 500;
             ctx.fillStyle = '#4CAF50';
-            ctx.fillRect(x - 5, this.y - 5, this.width + 10, this.height + 10);
+            ctx.fillRect(x - 1, this.y - 1, this.width + 2, this.height + 2);
         }
 
-        // Draw miss effect
         if (this.missEffect) {
             ctx.globalAlpha = this.missEffect.lifetime / 500;
             ctx.fillStyle = '#FF5252';
-            ctx.fillRect(x - 5, this.y - 5, this.width + 10, this.height + 10);
+            ctx.fillRect(x - 1, this.y - 1, this.width + 2, this.height + 2);
         }
 
         ctx.restore();

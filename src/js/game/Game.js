@@ -16,9 +16,10 @@ class Game {
         // Note management
         this.notes = [];
         this.lastNoteTime = 0;
-        this.noteInterval = 1000; // Time between notes in milliseconds
+        this.noteInterval = 400; // time between notes
+        this.nextLaneIndex = 0; // For sequential lane generation
 
-        // Speed variations
+        // Increased speed variations
         this.speedLevels = [
             300,  // Slow
             400,  // Normal
@@ -98,11 +99,20 @@ class Game {
     }
 
     generateNote() {
-        const lane = Math.floor(Math.random() * this.lanes);
+        // Generate notes in a more structured pattern
+        const lane = this.nextLaneIndex;
+        this.nextLaneIndex = (this.nextLaneIndex + 2) % this.lanes; // Skip one lane for better pattern
+
         const speed = this.speedLevels[Math.floor(Math.random() * this.speedLevels.length)];
-        const shape = this.noteShapes[Math.floor(Math.random() * this.noteShapes.length)];
-        const note = new Note(lane, speed, shape);
+        const note = new Note(lane, speed);
         this.notes.push(note);
+
+        // Occasionally generate additional notes for chords
+        if (Math.random() < 0.3) { // 30% chance for additional note
+            const additionalLane = (lane + 2) % this.lanes;
+            const additionalNote = new Note(additionalLane, speed);
+            this.notes.push(additionalNote);
+        }
     }
 
     update(deltaTime) {
@@ -153,22 +163,30 @@ class Game {
     }
 
     drawHitZone() {
-        // Draw hit zone background only (no borders)
-        const hitZoneY = 545;  // Adjusted for 10px height
+        const hitZoneY = 545;
         const hitZoneHeight = 10;
 
         // Draw semi-transparent background
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; // Reduced opacity
         this.ctx.fillRect(0, hitZoneY, this.canvas.width, hitZoneHeight);
 
-        // Draw key labels
-        this.ctx.fillStyle = '#FFF';
-        this.ctx.font = '16px Arial';
+        // Draw key labels with enhanced style
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Semi-transparent white
+        this.ctx.font = 'bold 14px Arial'; // Bold and slightly smaller
         this.ctx.textAlign = 'center';
 
         for (let i = 0; i < this.lanes; i++) {
             const x = i * this.laneWidth + this.laneWidth / 2;
-            this.ctx.fillText(this.keyLabels[i], x, hitZoneY + 8); // Adjusted y position for centered text
+
+            // Draw key background
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            this.ctx.beginPath();
+            this.ctx.roundRect(x - 10, hitZoneY - 2, 20, 14, 4);
+            this.ctx.fill();
+
+            // Draw key label
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            this.ctx.fillText(this.keyLabels[i], x, hitZoneY + 8);
         }
     }
 
