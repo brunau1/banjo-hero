@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banjo Hero</title>
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div class="lane-markers">
+            <div class="lane-marker">A</div>
+            <div class="lane-marker">S</div>
+            <div class="lane-marker">D</div>
+            <div class="lane-marker">F</div>
+            <div class="lane-marker">G</div>
+        </div>
+        <div id="score">Score: <span id="score-value">0</span></div>
+    </div>
+
+    <script src="src/js/game/Note.js"></script>
+    <script src="src/js/game/Score.js"></script>
+    <script src="src/js/game/Player.js"></script>
+    <script src="src/js/audio/SoundBank.js"></script>
+    <script src="src/js/audio/AudioManager.js"></script>
+    <script src="src/js/game/Game.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const game = new Game();
+            game.init();
+        });
+    </script>
+</body>
+</html>
