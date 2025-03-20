@@ -36,6 +36,18 @@ body {
     text-align: center;
     color: white;
     font-family: Arial, sans-serif;
+    transition: background-color 0.2s;
+}
+
+.lane-marker.active {
+    background-color: #4CAF50;
+    box-shadow: 0 0 10px #4CAF50;
+}
+
+#game-container {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 #score {
